@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.deeplearning4j:deeplearning4j-ui:unknown">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/deeplearning4j/deeplearning4j-ui/unknown/deeplearning4j-ui-unknown.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/deeplearning4j/deeplearning4j-ui/unknown/deeplearning4j-ui-unknown-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/deeplearning4j/deeplearning4j-ui/unknown/deeplearning4j-ui-unknown-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
