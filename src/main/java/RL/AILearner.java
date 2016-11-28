@@ -1,6 +1,7 @@
 package RL;
 
 import Model.Command;
+import Model.Feature;
 import Model.State;
 
 /**
@@ -10,16 +11,19 @@ public abstract class AILearner {
     boolean isTraining;
 
 
+
+
     public AILearner(boolean isTraining){
         this.isTraining = isTraining;
     }
-    public Command play(State state){
-        if (isTraining) return playTraining(state);
-        else return playTrained(state);
+    public Command play(Feature feature){
+        if (isTraining) return playTraining(feature);
+        else return playTrained(feature);
     }
 
-    abstract Command playTrained(State state);
+    abstract Command playTrained(Feature feature);
 
-    abstract Command playTraining(State state);
+    abstract Command playTraining(Feature feature);
 
+    abstract Double getReward(State state,Command command);
 }

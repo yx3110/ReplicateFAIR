@@ -1,6 +1,7 @@
 package RL;
 
 import Model.Command;
+import Model.Feature;
 import Model.State;
 
 /**
@@ -11,11 +12,16 @@ public class ZOGLearner extends AILearner {
         super(isTraining);
     }
 
-    Command playTrained(State state) {
+    Command playTrained(Feature feature) {
         return null;
     }
 
-    Command playTraining(State state) {
+    Command playTraining(Feature feature) {
+        return null;
+    }
+
+
+    Double getReward(State state, Command command) {
         return null;
     }
 }

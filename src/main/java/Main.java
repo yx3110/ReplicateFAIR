@@ -1,3 +1,4 @@
+import Model.Feature;
 import RL.AILearner;
 import RL.DQNLearner;
 import Model.Action;
@@ -7,9 +8,7 @@ import bwapi.*;
 import bwta.BWTA;
 import bwta.BaseLocation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Main extends DefaultBWListener {
 
@@ -19,8 +18,7 @@ public class Main extends DefaultBWListener {
 
     private Player self;
 
-    private int frameCounter = -1;
-
+    private Map<Unit,Command> lastCommands;
     private static final boolean isTrianing = true;
 
     private Player enemy;
@@ -41,6 +39,7 @@ public class Main extends DefaultBWListener {
         game = mirror.getGame();
         self = game.self();
         enemy = game.enemy();
+        lastCommands = new HashMap<Unit, Command>();
         //set learner
         aiLearner = new DQNLearner(isTrianing);
 
@@ -67,27 +66,29 @@ public class Main extends DefaultBWListener {
     public void onFrame() {
 
         //Skip Frame
-        frameCounter++;
-        if(frameCounter%8 != 0) return;
+
+        if(game.getFrameCount()%9 != 0) return;
 
         game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
         List<Unit> myUnits = self.getUnits();
-        List<Unit> enemyUnits = enemy.getUnits();
 
         Collections.shuffle(myUnits);
         List<Action> prevActions = new ArrayList<Action>();
+        List<Feature> features = new ArrayList<Feature>();
         for(Unit cur:myUnits){
-            State curState = new State(game,cur,prevActions);
-            Command command = aiLearner.play(curState);
-            Action action = new Action(cur,command);
-            prevActions.add(action);
-            command.execute();
+            State curState = new State(game,cur,prevActions,lastCommands);
+            Feature curFeature = new Feature(curState);
+            Command command = aiLearner.play(curFeature);
+
+            features.add(curFeature);
+
         }
 
-        //Issue Commands
+        updateReward();
 
-        //draw my units on screen
+    }
 
+    private void updateReward() {
     }
 
     public static void main(String[] args) {
