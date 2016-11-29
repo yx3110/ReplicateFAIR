@@ -12,11 +12,11 @@ public class ReinforceLearner extends AILearner {
         super(isTraining);
     }
 
-    Command playTrained(Feature feature) {
+    Command playTrained(State state) {
         return null;
     }
 
-    Command playTraining(Feature feature) {
+    Command playTraining(State state) {
         return null;
     }
 

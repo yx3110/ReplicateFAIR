@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="ReplicateFAIR" target="1.8.0_111" />
+      <module name="ReplicateFAIR" target="1.8.0_112-release" />
     </bytecodeTargetLevel>
   </component>
 </project>

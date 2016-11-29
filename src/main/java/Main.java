@@ -74,18 +74,14 @@ public class Main extends DefaultBWListener {
 
         Collections.shuffle(myUnits);
         List<Action> prevActions = new ArrayList<Action>();
-        List<Feature> features = new ArrayList<Feature>();
+
         for(Unit cur:myUnits){
             State curState = new State(game,cur,prevActions,lastCommands);
-            Feature curFeature = new Feature(curState);
-            Command command = aiLearner.play(curFeature);
-
-            features.add(curFeature);
-
+            Command command = aiLearner.play(curState);
+            command.execute();
         }
 
         updateReward();
-
     }
 
     private void updateReward() {

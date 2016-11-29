@@ -12,13 +12,14 @@ public class ZOGLearner extends AILearner {
         super(isTraining);
     }
 
-    Command playTrained(Feature feature) {
+    Command playTrained(State state) {
         return null;
     }
 
-    Command playTraining(Feature feature) {
+    Command playTraining(State state) {
         return null;
     }
+
 
 
     Double getReward(State state, Command command) {

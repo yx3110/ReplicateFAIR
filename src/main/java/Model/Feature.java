@@ -19,9 +19,6 @@ public class Feature {
     private List<Double> vals;
 
 
-
-
-
     public Feature(State state ){
         this.state = state;
         curUnit = state.getUnit();
@@ -70,7 +67,7 @@ public class Feature {
         prevCurCommandType =state.getLastCommands().get(prevUnit).getCommandType().getVal();
         vals.add(prevCurCommandType);
         prevNextCommandType = state.getPrevActions().get(state.getPrevActions().size()-1).getCommand().getCommandType().getVal();
-
+        vals.add(prevNextCommandType);
         curUnitType = curUnit.getType().equals(UnitType.Terran_Marine)?1:0;
         vals.add(curUnitType);
         a1b1 = getDistance(prevUnit.getPosition(),curUnit.getPosition());
@@ -81,7 +78,10 @@ public class Feature {
         vals.add(a2b1);
         a2b2 = getDistance(prevUnit.getTargetPosition(),curUnit.getTargetPosition());
         vals.add(a2b2);
-        a3b1 = getDistance(prevUnit)
+        a3b1 = getDistance(state.getPrevActions().get(state.getPrevActions().size()-1).getCommand().getTargetPos(),curUnit.getPosition());
+        vals.add(a3b1);
+        a3b2 = getDistance(state.getPrevActions().get(state.getPrevActions().size()-1).getCommand().getTargetPos(),curUnit.getLastCommand().getTargetPosition());
+        vals.add(a3b2);
 
 
     }
