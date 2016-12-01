@@ -36,13 +36,13 @@ public class Feature {
     }
 
     public void initFeature(){
-        double prevIsEnemy;
-        double prevUnitType;
-        double prevHP;
-        double prevShield;
-        double prevCD;
-        double prevCurCommandType;
-        double prevNextCommandType;
+        double isEnemy;
+        double unitType;
+        double HP;
+        double shield;
+        double CD;
+        double curCommandType;
+        double nextCommandType;
         double curUnitType;
         //a1:u.pos,a2: u.cur_cmd.target_pos,a3:u.next_cmd.target_pos
         //b1:uk+1.pos, b2:uk+1.cur_cmd.target_pos, b3:c.target_pos
@@ -54,22 +54,23 @@ public class Feature {
         double a3b2;
 
 
-        prevIsEnemy = subState.getGame().self().equals(curUnit.getPlayer())?1:0;
-        vals.add(prevIsEnemy);
+        isEnemy = subState.getGame().self().equals(curUnit.getPlayer())?1:0;
+        vals.add(isEnemy);
         // type always marine ATM
-        prevUnitType = curUnit.getType().equals(UnitType.Terran_Marine)?1:0;
-        vals.add(prevUnitType);
-        prevHP = curUnit.getHitPoints();
-        vals.add(prevHP);
-        prevShield = curUnit.getShields();
-        vals.add(prevShield);
-        prevCD = curUnit.getGroundWeaponCooldown();
-        vals.add(prevCD);
+        unitType = curUnit.getType().equals(UnitType.Terran_Marine)?1:0;
+        vals.add(unitType);
+        HP = curUnit.getHitPoints();
+        vals.add(HP);
+        shield = curUnit.getShields();
+        vals.add(shield);
+        CD = curUnit.getGroundWeaponCooldown();
+        vals.add(CD);
         //!!!!!!!!!!!!!!
-        prevCurCommandType =prevActions.get(prevActions.size()-1).getCommand().getCommandType().getVal();
-        vals.add(prevCurCommandType);
-        prevNextCommandType = prevActions.get(prevActions.size()-1).getCommand().getCommandType().getVal();
-        vals.add(prevNextCommandType);
+        curCommandType =prevActions.get(prevActions.size()-1).getCommand().getCommandType().getVal();
+        vals.add(curCommandType);
+        //!!!!!!!!!!!!!
+        nextCommandType = prevActions.get(prevActions.size()-1).getCommand().getCommandType().getVal();
+        vals.add(nextCommandType);
         //!!!!!!!!!!!!!
         curUnitType = curUnit.getType().equals(UnitType.Terran_Marine)?1:0;
         vals.add(curUnitType);
@@ -85,8 +86,6 @@ public class Feature {
         vals.add(a3b1);
         a3b2 = getDistance(prevActions.get(prevActions.size()-1).getCommand().getTargetPos(),curUnit.getLastCommand().getTargetPosition());
         vals.add(a3b2);
-
-
     }
 
     private double getDistance(Position pos1, Position pos2){

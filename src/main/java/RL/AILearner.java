@@ -18,7 +18,7 @@ public abstract class AILearner {
     public AILearner(boolean isTraining){
         this.isTraining = isTraining;
     }
-    public List<Action> play(State state){
+    public  List<Action> play(State state){
         if (isTraining) return playTraining(state);
         else return playTrained(state);
     }
@@ -32,26 +32,9 @@ public abstract class AILearner {
 
     protected abstract Action playSubTraining(SubState subState);
 
-    public List<Action> playTrained(State state){
-        List<Action> res = new ArrayList<Action>();
-        while(state.hasNextSubState()) {
-            SubState subState = state.getNextSubState();
-            Action cur = playSubTrained(subState);
-            state.updatePrevActions(cur);
-            res.add(cur);
-        }
-        return res;
-    }
+    public abstract List<Action> playTrained(State state);
 
-    public List<Action> playTraining(State state){
-        List<Action> res = new ArrayList<Action>();
-        while(state.hasNextSubState()) {
-            SubState subState = state.getNextSubState();
-            Action cur = playSubTraining(subState);
-            res.add(cur);
-        }
-        return res;
-    }
+    public abstract List<Action> playTraining(State state);
 
     abstract Double getReward(State state,Command command);
     public static List<Command> getAvailableCommands(State state){

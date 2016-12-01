@@ -22,4 +22,8 @@ public class SubState {
         this.game = game;
         this.prevActions = prevActions;
     }
+
+    public List<Command> getPossibleCommands() {
+        return null;
+    }
 }
