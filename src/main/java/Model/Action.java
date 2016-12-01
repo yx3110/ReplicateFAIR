@@ -16,4 +16,8 @@ public class Action {
         this.unit = cur;
         this.command = command;
     }
+
+    public void execute() {
+        command.execute();
+    }
 }

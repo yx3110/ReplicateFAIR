@@ -1,8 +1,8 @@
 package RL;
 
-import Model.Command;
-import Model.Feature;
-import Model.State;
+import Model.*;
+
+import java.util.List;
 
 /**
  * Created by Yang Xu on 24/11/2016.
@@ -12,17 +12,17 @@ public class ZOGLearner extends AILearner {
         super(isTraining);
     }
 
-    Command playTrained(State state) {
+    protected Action playSubTrained(SubState subState) {
         return null;
     }
 
-    Command playTraining(State state) {
+    protected Action playSubTraining(SubState subState) {
         return null;
     }
-
-
 
     Double getReward(State state, Command command) {
         return null;
     }
+
+
 }

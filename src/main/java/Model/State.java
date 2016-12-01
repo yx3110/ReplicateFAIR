@@ -5,40 +5,50 @@ import bwapi.Unit;
 import lombok.Getter;
 
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Yang Xu on 23/11/2016.
  */
 public class State {
     @Getter
-    private Map<Unit,Command> lastCommands;
-    @Getter
     private Game game;
-    @Getter
-    private Unit unit;
+    Random random;
+
+    private List<Unit> unitLeft;
     @Getter
     private List<Action> prevActions;
-    public State(Game game, Unit unit, List<Action> prevActions,Map<Unit,Command> lastCommands){
-        this.unit = unit;
-        this.prevActions = prevActions;
+
+    public State(Game game){
         this.game = game;
-        this.lastCommands = lastCommands;
+        random = new Random();
+        prevActions = new ArrayList<Action>();
     }
 
-    public List<Unit> getMyUnits(){
-        return game.self().getUnits();
+    public SubState getNextSubState() {
+
+        Unit cur = fetchNextUnit(unitLeft);
+        SubState res = new SubState(cur,game,prevActions);
+        unitLeft = new ArrayList<Unit>();
+        unitLeft.addAll(game.getAllUnits());
+
+        return res;
     }
-    public List<Unit> getEnemyUnits(){
-        return game.enemy().getUnits();
+
+    private Unit fetchNextUnit(List<Unit> unitLeft) {
+        int index = random.nextInt(unitLeft.size()-1);
+        Unit res = unitLeft.remove(index);
+        return res ;
     }
 
-    public List<Unit> getAllUnits(){
-        return game.getAllUnits();
+    public boolean hasNextSubState() {
+        return unitLeft.size()!=0;
     }
 
-
-
+    public void updatePrevActions(Action cur) {
+        prevActions.add(cur);
+    }
 
 }

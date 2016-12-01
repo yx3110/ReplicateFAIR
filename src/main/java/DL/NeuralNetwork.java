@@ -29,7 +29,7 @@ public class NeuralNetwork {
     }
 
     public double getScore(State state, Command cur) {
-        int rowNum = state.getAllUnits().size();
+        int rowNum = state.getGame().getAllUnits().size();
 
         return 0;
     }

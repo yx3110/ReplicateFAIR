@@ -1,10 +1,10 @@
 package RL;
 
 import DL.NeuralNetwork;
-import Model.Command;
-import Model.State;
+import Model.*;
 
 import java.net.CookieHandler;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,23 +20,15 @@ public class DQNLearner extends AILearner {
         super(isTraining);
     }
 
-    Command playTrained(State state) {
-        NeuralNetwork nn= NeuralNetwork.loadData(super.dataURL);
-        List<Command> commands= super.getAvailableCommands(state);
-        double maxScore = 0;
-        Command res = commands.get(0);
-        for(Command cur:commands){
-            double curScore = nn.getScore(state,cur);
-            maxScore = curScore>maxScore?curScore:maxScore;
-            res = curScore>maxScore?cur:res;
-        }
-        return res;
-    }
-
-    Command playTraining(State state) {
+    protected Action playSubTrained(SubState subState) {
+        Feature feature = new Feature(subState);
         return null;
     }
 
+    protected Action playSubTraining(SubState subState) {
+        Feature feature = new Feature(subState);
+        return null;
+    }
 
 
     Double getReward(State state, Command command) {

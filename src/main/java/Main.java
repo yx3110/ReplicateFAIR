@@ -1,9 +1,6 @@
-import Model.Feature;
+import Model.*;
 import RL.AILearner;
 import RL.DQNLearner;
-import Model.Action;
-import Model.Command;
-import Model.State;
 import bwapi.*;
 import bwta.BWTA;
 import bwta.BaseLocation;
@@ -73,15 +70,15 @@ public class Main extends DefaultBWListener {
         List<Unit> myUnits = self.getUnits();
 
         Collections.shuffle(myUnits);
-        List<Action> prevActions = new ArrayList<Action>();
 
-        for(Unit cur:myUnits){
-            State curState = new State(game,cur,prevActions,lastCommands);
-            Command command = aiLearner.play(curState);
-            command.execute();
+        State curState = new State(game);
+        List<Action> actions = aiLearner.play(curState);
+        for(Action action:actions){
+            action.execute();
         }
 
-        updateReward();
+
+// TODO: 30/11/2016 Reward update
     }
 
     private void updateReward() {
