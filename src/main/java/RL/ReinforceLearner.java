@@ -20,6 +20,14 @@ public class ReinforceLearner extends AILearner {
         return null;
     }
 
+    public List<Action> playTrained(State state) {
+        return null;
+    }
+
+    public List<Action> playTraining(State state) {
+        return null;
+    }
+
 
     Double getReward(State state, Command command) {
         return null;
