@@ -22,34 +22,20 @@ public class Command {
 
     }
 
-    @Getter@Setter
-    private cType commandType;
-
-    private final Unit unit;
-    @Getter
-    private Position targetPos;
-
-    public static cType parseCType(UnitCommandType type){
-        if(type==UnitCommandType.Attack_Move||type==UnitCommandType.Attack_Unit){
-            return Command.cType.atk;
-        }else if (type == UnitCommandType.Move){
-            return cType.move;
-        }
-        return cType.noCommand;
-    }
-
-    public Command(Unit unit){
-        this.unit = unit;
-    }
-
-    public Command(Unit unit,cType cType,Position targetPos){
-        this.commandType = cType;
-        this.unit = unit;
+    public Command(cType type, Position targetPos){
+        this.commandType = type;
         this.targetPos = targetPos;
     }
 
-    public void execute(){
-        Position position= unit.getPosition();
+    @Getter@Setter
+    private cType commandType;
+
+    @Getter
+    private Position targetPos;
+
+
+
+    public void execute(Unit unit){
         switch (commandType){
             case move:
                 unit.move(targetPos);

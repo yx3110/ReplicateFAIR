@@ -18,6 +18,6 @@ public class Action {
     }
 
     public void execute() {
-        command.execute();
+        command.execute(unit);
     }
 }
