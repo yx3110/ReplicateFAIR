@@ -4,6 +4,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitCommandType;
 import bwapi.UnitType;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,20 +14,26 @@ import java.util.List;
  */
 public class Feature {
     private SubState subState;
+    @Getter
     private Unit curUnit;
-    private Unit prevUnit;
     private List<Action> prevActions;
+    @Getter
+    private Command command;
 
     private List<Double> vals;
 
 
-    public Feature(SubState subState){
+    public Feature(SubState subState,Command command){
         curUnit = subState.getUnit();
         this.subState = subState;
-        prevUnit = subState.getPrevActions().get(subState.getPrevActions().size()-1).getUnit();
         prevActions = subState.getPrevActions();
         vals = new ArrayList<Double>();
+        this.command = command;
         initFeature();
+    }
+
+    private Unit getPrevUnit(){
+        return prevActions.get(prevActions.size()-1).getUnit();
     }
 
     public void updateWithCommand(Command candidate){
@@ -74,13 +81,13 @@ public class Feature {
         //!!!!!!!!!!!!!
         curUnitType = curUnit.getType().equals(UnitType.Terran_Marine)?1:0;
         vals.add(curUnitType);
-        a1b1 = getDistance(prevUnit.getPosition(),curUnit.getPosition());
+        a1b1 = getDistance(getPrevUnit().getPosition(),curUnit.getPosition());
         vals.add(a1b1);
-        a1b2 = getDistance(prevUnit.getPosition(),curUnit.getTargetPosition());
+        a1b2 = getDistance(getPrevUnit().getPosition(),curUnit.getTargetPosition());
         vals.add(a1b2);
-        a2b1 = getDistance(prevUnit.getTargetPosition(),curUnit.getPosition());
+        a2b1 = getDistance(getPrevUnit().getTargetPosition(),curUnit.getPosition());
         vals.add(a2b1);
-        a2b2 = getDistance(prevUnit.getTargetPosition(),curUnit.getTargetPosition());
+        a2b2 = getDistance(getPrevUnit().getTargetPosition(),curUnit.getTargetPosition());
         vals.add(a2b2);
         a3b1 = getDistance(prevActions.get(prevActions.size()-1).getCommand().getTargetPos(),curUnit.getPosition());
         vals.add(a3b1);
@@ -91,11 +98,6 @@ public class Feature {
     private double getDistance(Position pos1, Position pos2){
         double a = Math.pow(pos1.getX()-pos2.getX(),2);
         double b = Math.pow(pos1.getY()-pos2.getY(),2);
-
         return Math.sqrt(a+b);
     }
-
-
-
-
 }

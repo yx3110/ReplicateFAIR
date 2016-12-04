@@ -28,9 +28,4 @@ public class ZOGLearner extends AILearner {
         return null;
     }
 
-    Double getReward(State state, Command command) {
-        return null;
-    }
-
-
 }

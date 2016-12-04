@@ -2,6 +2,7 @@ package RL;
 
 import DL.NeuralNetwork;
 import Model.*;
+import bwapi.Unit;
 
 import java.net.CookieHandler;
 import java.util.ArrayList;
@@ -14,14 +15,16 @@ import java.util.Random;
 public class DQNLearner extends AILearner {
     private State prevState;
     Random random;
+    NeuralNetwork nn;
 
-    public double getReward(State state, State prevState) {
-        return 0;
-    }
+    private static final double epsilon = 0.9;
 
     public DQNLearner(boolean isTraining) {
         super(isTraining);
         random = new Random();
+        nn = new NeuralNetwork();
+        if(!isTraining)nn.loadData(dataURL);
+
     }
 
     protected Action playSubTrained(SubState subState) {
@@ -50,36 +53,56 @@ public class DQNLearner extends AILearner {
         return getActionsTraining(subStates);
     }
 
-    private List<Action> getActionsTraining(List<SubState> subStates) {
+    private List<Action> getActionsTrained(List<SubState> subStates){
         List<Action> res = new ArrayList<Action>();
-        List<List<Feature>> possFeatures = new ArrayList<List<Feature>>();
-        //initialize list
-        //No. of substates = No. of units
-        for(int i = 0;i<subStates.size();i++){
-            List<Command> curCommands = subStates.get(i).getPossibleCommands();
-            for (int j = 0;j<curCommands.size();j++){
-                for(int k = 0;k<subStates.size();k++){
-                    List<Feature> curList = new ArrayList<Feature>();
-                    possFeatures.add(curList);
-                }
+        List<List<Feature>> possFeatures = getPossFeatures(subStates);
+
+        double bestScore = 0;
+        List<Feature> best = possFeatures.get(0);
+        for(int i = 0;i<possFeatures.size();i++){
+            double curScore = getScore(possFeatures.get(i));
+            if(curScore>bestScore) {
+                bestScore = curScore;
+                best = possFeatures.get(i);
             }
         }
-
-        //fill with features.
-
-        for (int i = 0; i < subStates.size(); i++) {
-            List<Command> curCommands = subStates.get(i).getPossibleCommands();
-            for (int j = 0; j < curCommands.size(); j++) {
-                for(int k = 0;k<subStates.size();k++){
-                    possFeatures.get(i+k).add()
-                }
-            }
-        }
-        return res;
+        return transToActions(best);
     }
 
+    private List<Action> getActionsTraining(List<SubState> subStates) {
+        List<List<Feature>> possFeatures = getPossFeatures(subStates);
 
-    Double getReward(State state, Command command) {
-        return null;
+        double dice = random.nextDouble();
+        if(dice>=epsilon){
+            return transToActions(possFeatures.get(random.nextInt(possFeatures.size())));
+        }else {
+            double bestScore = 0;
+            List<Feature> best = possFeatures.get(0);
+            for (int i = 0; i < possFeatures.size(); i++) {
+                double curScore = getScore(possFeatures.get(i));
+                if (curScore > bestScore) {
+                    bestScore = curScore;
+                    best = possFeatures.get(i);
+                }
+            }
+            return transToActions(best);
+        }
+    }
+
+    private double getScore(List<Feature> features) {
+
+        return nn.getScore(features);
+    }
+
+    private List<Action> transToActions(List<Feature> features) {
+        List<Action> res = new ArrayList<Action>();
+
+        for (Feature curFeature:features){
+            Unit curUnit = curFeature.getCurUnit();
+            Command curCommand = curFeature.getCommand();
+            Action curAction = new Action(curUnit,curCommand);
+            res.add(curAction);
+        }
+        return res;
     }
 }

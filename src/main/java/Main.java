@@ -11,6 +11,7 @@ public class Main extends DefaultBWListener {
 
     private Mirror mirror = new Mirror();
 
+    private State prevState;
     private Game game;
 
     private Player self;
@@ -61,7 +62,9 @@ public class Main extends DefaultBWListener {
 
     @Override
     public void onFrame() {
-
+        if(self.getUnits().size()== 0||enemy.getUnits().size()==0){
+            gameEnd();
+        }
         //Skip Frame
 
         if(game.getFrameCount()%9 != 0) return;
@@ -76,9 +79,10 @@ public class Main extends DefaultBWListener {
         for(Action action:actions){
             action.execute();
         }
+    }
 
+    private void gameEnd() {
 
-// TODO: 30/11/2016 Reward update
     }
 
     private void updateReward() {
