@@ -17,13 +17,10 @@ public class SubState {
     Unit unit;
     @Getter
     Game game;
-    @Getter
-    private List<Action> prevActions;
 
-    public SubState(Unit unit,Game game,List<Action> prevActions){
+    public SubState(Unit unit,Game game){
         this.unit = unit;
         this.game = game;
-        this.prevActions = prevActions;
     }
 
     public List<Command> getPossibleCommands() {

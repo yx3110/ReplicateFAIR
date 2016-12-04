@@ -27,21 +27,14 @@ public class DQNLearner extends AILearner {
 
     }
 
-    protected Action playSubTrained(SubState subState) {
-        // TODO: 02/12/2016
-
-        return null;
-    }
-
-    protected Action playSubTraining(SubState subState) {
-        // TODO: 02/12/2016
-        return null;
-    }
-
     public List<Action> playTrained(State state) {
-        List<Action> res = new ArrayList<Action>();
+        List<SubState> subStates = new ArrayList<SubState>();
+        while (state.hasNextSubState()) {
+            subStates.add(state.getNextSubState());
+        }
 
-        return res;
+        return getActionsTrained(subStates);
+
     }
 
     public List<Action> playTraining(State state) {
@@ -54,7 +47,6 @@ public class DQNLearner extends AILearner {
     }
 
     private List<Action> getActionsTrained(List<SubState> subStates){
-        List<Action> res = new ArrayList<Action>();
         List<List<Feature>> possFeatures = getPossFeatures(subStates);
 
         double bestScore = 0;

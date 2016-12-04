@@ -16,24 +16,24 @@ public class Feature {
     private SubState subState;
     @Getter
     private Unit curUnit;
-    private List<Action> prevActions;
     @Getter
     private Command command;
 
+    List<Feature> prevFeatures;
     private List<Double> vals;
 
 
-    public Feature(SubState subState,Command command){
+    public Feature(SubState subState,Command command,List<Feature> prevFeatures){
         curUnit = subState.getUnit();
         this.subState = subState;
-        prevActions = subState.getPrevActions();
+        this.prevFeatures = prevFeatures;
         vals = new ArrayList<Double>();
         this.command = command;
         initFeature();
     }
 
     private Unit getPrevUnit(){
-        return prevActions.get(prevActions.size()-1).getUnit();
+        return prevFeatures.get(prevFeatures.size()-1).getCurUnit();
     }
 
     public void updateWithCommand(Command candidate){
@@ -73,10 +73,10 @@ public class Feature {
         CD = curUnit.getGroundWeaponCooldown();
         vals.add(CD);
         //!!!!!!!!!!!!!!
-        curCommandType =prevActions.get(prevActions.size()-1).getCommand().getCommandType().getVal();
+        curCommandType =prevFeatures.get(prevFeatures.size()-1).getCommand().getCommandType().getVal();
         vals.add(curCommandType);
         //!!!!!!!!!!!!!
-        nextCommandType = prevActions.get(prevActions.size()-1).getCommand().getCommandType().getVal();
+        nextCommandType = prevFeatures.get(prevFeatures.size()-1).getCommand().getCommandType().getVal();
         vals.add(nextCommandType);
         //!!!!!!!!!!!!!
         curUnitType = curUnit.getType().equals(UnitType.Terran_Marine)?1:0;
@@ -89,9 +89,9 @@ public class Feature {
         vals.add(a2b1);
         a2b2 = getDistance(getPrevUnit().getTargetPosition(),curUnit.getTargetPosition());
         vals.add(a2b2);
-        a3b1 = getDistance(prevActions.get(prevActions.size()-1).getCommand().getTargetPos(),curUnit.getPosition());
+        a3b1 = getDistance(prevFeatures.get(prevFeatures.size()-1).getCommand().getTargetPos(),curUnit.getPosition());
         vals.add(a3b1);
-        a3b2 = getDistance(prevActions.get(prevActions.size()-1).getCommand().getTargetPos(),curUnit.getLastCommand().getTargetPosition());
+        a3b2 = getDistance(prevFeatures.get(prevFeatures.size()-1).getCommand().getTargetPos(),curUnit.getLastCommand().getTargetPosition());
         vals.add(a3b2);
     }
 

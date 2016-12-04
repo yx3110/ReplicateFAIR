@@ -9,8 +9,10 @@ import java.util.*;
 
 public class Main extends DefaultBWListener {
 
+
     private Mirror mirror = new Mirror();
 
+    private Map<State[], Double> rewardMap;
     private State prevState;
     private Game game;
 
@@ -56,6 +58,7 @@ public class Main extends DefaultBWListener {
         	}
         	System.out.println();
         }
+        prevState = new State(game);
 
     }
 
@@ -65,27 +68,33 @@ public class Main extends DefaultBWListener {
         if(self.getUnits().size()== 0||enemy.getUnits().size()==0){
             gameEnd();
         }
+        State curState = new State(game);
+        updateReward(curState);
         //Skip Frame
 
         if(game.getFrameCount()%9 != 0) return;
 
         game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
-        List<Unit> myUnits = self.getUnits();
 
-        Collections.shuffle(myUnits);
-
-        State curState = new State(game);
         List<Action> actions = aiLearner.play(curState);
         for(Action action:actions){
             action.execute();
         }
+        prevState = curState;
     }
 
     private void gameEnd() {
 
     }
 
-    private void updateReward() {
+    private void updateReward(State curState) {
+        State[] statePair= new State[2];
+        statePair[0] = prevState;
+        statePair[1] = curState;
+        double healthDiff = prevState.healthDiff(curState);
+        double prevTotalUnit = prevState.getGame().getAllUnits().size();
+        double curTotalUnit = curState.getGame().getAllUnits().size();
+
     }
 
     public static void main(String[] args) {

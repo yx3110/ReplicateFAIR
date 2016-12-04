@@ -12,14 +12,6 @@ public class ReinforceLearner extends AILearner {
         super(isTraining);
     }
 
-    protected Action playSubTrained(SubState subState) {
-        return null;
-    }
-
-    protected Action playSubTraining(SubState subState) {
-        return null;
-    }
-
     public List<Action> playTrained(State state) {
         return null;
     }
