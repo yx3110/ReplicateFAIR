@@ -43,6 +43,10 @@ public class Command {
             case atk:
                 unit.attack(targetPos);
                 break;
+            case noCommand:
+                break;
+            default:
+                break;
         }
     }
 }

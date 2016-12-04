@@ -65,8 +65,8 @@ public class SubState {
         res.add(sw);
         Command se = new Command(Command.cType.move,new Position(unit.getX()+1,unit.getY()-1));
         res.add(se);
-        Command stay = new Command(Command.cType.move,new Position(unit.getX(),unit.getY()));
-        res.add(stay);
+        Command noCommand = new Command(Command.cType.noCommand,unit.getPosition());
+        res.add(noCommand);
         return res;
     }
 }
