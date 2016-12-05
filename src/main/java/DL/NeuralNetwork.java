@@ -15,8 +15,13 @@ import java.util.List;
  */
 public class NeuralNetwork {
 
-    public final static int colNum = 17;
 
+
+    final int numRows = 28; // The number of rows of a matrix.
+    final int numColumns = 28; // The number of columns of a matrix.
+    int outputNum = 10; // Number of possible outcomes (e.g. labels 0 through 9).
+    int batchSize = 128; // How many examples to fetch with each step.
+    int numEpochs = 15; // An epoch is a complete pass through a given dataset.
     static final int rngSeed = 123;
 
     public NeuralNetwork(String dataURL){

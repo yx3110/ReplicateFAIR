@@ -36,10 +36,13 @@ public class Feature {
         return prevFeatures.get(prevFeatures.size()-1).getCurUnit();
     }
 
-    public void updateWithCommand(Command candidate){
-        double a1b3;
-        double a2b3;
-        double a3b3;
+    public void updateWithCommand(List<Double> values){
+        double a1b3 = getDistance(getPrevUnit().getPosition(),command.getTargetPos());
+        values.add(a1b3);
+        double a2b3 = getDistance(getPrevUnit().getTargetPosition(),command.getTargetPos()) ;
+        values.add(a2b3);
+        double a3b3 = getDistance(prevFeatures.get(prevFeatures.size()-1).getCommand().getTargetPos(),command.getTargetPos());
+        values.add(a3b3);
     }
 
     public void initFeature(){
