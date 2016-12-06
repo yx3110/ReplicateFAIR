@@ -3,12 +3,12 @@
   <component name="EclipseModuleManager">
     <libelement value="file://lib/bwmirror_v2_5.jar" />
     <src_description expected_position="0">
-      <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
+      <src_folder value="file://C:/BWAPI/ExampleBot/src" expected_position="0" />
     </src_description>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/target/classes" />
-    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <output url="file://C:/BWAPI/ExampleBot/target/classes" />
+    <output-test url="file://C:/BWAPI/ExampleBot/target/test-classes" />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
@@ -20,7 +20,7 @@
     <orderEntry type="module-library" exported="">
       <library name="bwmirror_v2_5.jar">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/bwmirror_v2_5.jar.zip!/" />
+          <root url="jar://C:/BWAPI/ExampleBot/lib/bwmirror_v2_5.jar.zip!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
