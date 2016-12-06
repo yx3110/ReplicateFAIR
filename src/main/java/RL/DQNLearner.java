@@ -1,10 +1,9 @@
 package RL;
 
-import DL.NeuralNetwork;
 import Model.*;
+import Connection.Client;
 import bwapi.Unit;
 
-import java.net.CookieHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,16 +14,14 @@ import java.util.Random;
 public class DQNLearner extends AILearner {
     private State prevState;
     Random random;
-    NeuralNetwork nn;
+    Client client;
 
     private static final double epsilon = 0.9;
 
     public DQNLearner(boolean isTraining) {
         super(isTraining);
         random = new Random();
-        nn = new NeuralNetwork();
-        if(!isTraining)nn.loadData(dataURL);
-
+        client = new Client();
     }
 
     public List<Action> playTrained(State state) {
@@ -32,6 +29,7 @@ public class DQNLearner extends AILearner {
         while (state.hasNextSubState()) {
             subStates.add(state.getNextSubState());
         }
+
 
         return getActionsTrained(subStates);
 
@@ -82,8 +80,13 @@ public class DQNLearner extends AILearner {
     }
 
     private double getScore(List<Feature> features) {
+        List<List<Double>> vals = new ArrayList<>();
+        for(Feature cur:features){
+            List<Double> curVals =cur.getVals();
+            vals.add(curVals);
+        }
 
-        return nn.getScore(features);
+        return Client.sendAndReceive(vals);
     }
 
     private List<Action> transToActions(List<Feature> features) {

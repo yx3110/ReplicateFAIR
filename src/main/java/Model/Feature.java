@@ -20,6 +20,7 @@ public class Feature {
     private Command command;
 
     List<Feature> prevFeatures;
+    @Getter
     private List<Double> vals;
 
 
