@@ -29,10 +29,11 @@ public class Client {
             ServerSocket receive = new ServerSocket(60011);
             Socket receiveSocket = receive.accept();
             ObjectInputStream ois =  new ObjectInputStream(receiveSocket.getInputStream());
-
+            double res = (double)ois.readObject();
             receive.close();
+
             ois.close();
-            return (double) ois.readObject();
+            return res;
         } catch (Exception e){
             e.printStackTrace();
             return -1;
