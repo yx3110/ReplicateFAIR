@@ -192,5 +192,6 @@
     <orderEntry type="library" name="Maven: org.nd4j:nd4j-cuda-8.0:macosx-x86_64:0.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.nd4j:nd4j-cuda-8.0:windows-x86_64:0.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.nd4j:nd4j-cuda-8.0:linux-ppc64le:0.7.0" level="project" />
+    <orderEntry type="library" name="bwmirror_v2_5.jar" level="project" />
   </component>
 </module>
