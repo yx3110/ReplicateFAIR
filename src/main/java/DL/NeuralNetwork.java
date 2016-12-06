@@ -7,6 +7,7 @@ import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.*;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.rl4j.util.DataManager;
 
 import java.util.List;
 
@@ -17,17 +18,17 @@ public class NeuralNetwork {
 
 
 
-    final int numRows = 28; // The number of rows of a matrix.
-    final int numColumns = 28; // The number of columns of a matrix.
-    int outputNum = 10; // Number of possible outcomes (e.g. labels 0 through 9).
-    int batchSize = 128; // How many examples to fetch with each step.
-    int numEpochs = 15; // An epoch is a complete pass through a given dataset.
+    final int numRows = 100; // The number of rows of a matrix.
+    final int numColumns = 100; // The number of columns of a matrix.
+    int outputNum = 100; // Number of possible outcomes (e.g. labels 0 through 9).
+
     static final int rngSeed = 123;
 
     public NeuralNetwork(String dataURL){
         loadData(dataURL);
     }
     public NeuralNetwork(){
+
         initNN();
     }
 
