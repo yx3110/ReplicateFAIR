@@ -11,6 +11,14 @@ import lombok.Setter;
  */
 public class Command {
 
+    public static cType parseCommandType(UnitCommandType unitCommandType) {
+        if (unitCommandType.equals(UnitCommandType.Attack_Move)||unitCommandType.equals(UnitCommandType.Attack_Unit)){
+            return cType.atk;
+        }else if (unitCommandType.equals(unitCommandType.Move)){
+            return cType.move;
+        }else return cType.noCommand;
+    }
+
     public enum cType{
         move(0),atk(1),noCommand(2);
         @Getter
@@ -32,8 +40,6 @@ public class Command {
 
     @Getter
     private Position targetPos;
-
-
 
     public void execute(Unit unit){
         switch (commandType){

@@ -1,18 +1,19 @@
 package Model;
 
-import bwapi.Position;
-import bwapi.Unit;
-import bwapi.UnitCommandType;
-import bwapi.UnitType;
+import bwapi.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by Yang Xu on 23/11/2016.
  */
 public class Feature {
+    static Logger logger = Logger.getLogger( Feature.class.getName() );
+
+
     private SubState subState;
     @Getter
     private Unit curUnit;
@@ -33,10 +34,11 @@ public class Feature {
         initFeature();
     }
 
-    private Unit getPrevUnit(){
-        return prevFeatures.get(prevFeatures.size()-1).getCurUnit();
+    private Unit getPrevUnit() {
+        if (prevFeatures.size() != 0) {
+            return prevFeatures.get(prevFeatures.size() - 1).getCurUnit();
+        }else return null;
     }
-
     public void updateWithCommand(List<Double> values){
         double a1b3 = getDistance(getPrevUnit().getPosition(),command.getTargetPos());
         values.add(a1b3);
@@ -77,12 +79,13 @@ public class Feature {
         CD = curUnit.getGroundWeaponCooldown();
         vals.add(CD);
         //!!!!!!!!!!!!!!
-        curCommandType =prevFeatures.get(prevFeatures.size()-1).getCommand().getCommandType().getVal();
+        UnitCommand prevCommand = curUnit.getLastCommand();
+        curCommandType =Command.parseCommandType(prevCommand.getUnitCommandType()).getVal();
         vals.add(curCommandType);
         //!!!!!!!!!!!!!
-        nextCommandType = prevFeatures.get(prevFeatures.size()-1).getCommand().getCommandType().getVal();
+        nextCommandType = command.getCommandType().getVal();
         vals.add(nextCommandType);
-        //!!!!!!!!!!!!!
+
         curUnitType = curUnit.getType().equals(UnitType.Terran_Marine)?1:0;
         vals.add(curUnitType);
         a1b1 = getDistance(getPrevUnit().getPosition(),curUnit.getPosition());
@@ -97,6 +100,7 @@ public class Feature {
         vals.add(a3b1);
         a3b2 = getDistance(prevFeatures.get(prevFeatures.size()-1).getCommand().getTargetPos(),curUnit.getLastCommand().getTargetPosition());
         vals.add(a3b2);
+
     }
 
     private double getDistance(Position pos1, Position pos2){

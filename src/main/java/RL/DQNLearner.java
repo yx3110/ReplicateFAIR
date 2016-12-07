@@ -7,12 +7,14 @@ import bwapi.Unit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 
 /**
  * Created by Yang Xu on 24/11/2016.
  */
 public class DQNLearner extends AILearner {
-    private State prevState;
+    static Logger logger = Logger.getLogger( DQNLearner.class.getName() );
+
     Random random;
     Client client;
 
@@ -25,59 +27,60 @@ public class DQNLearner extends AILearner {
     }
 
     public List<Action> playTrained(State state) {
-        List<SubState> subStates = new ArrayList<SubState>();
+        List<Feature> features = new ArrayList<Feature>();
         while (state.hasNextSubState()) {
-            subStates.add(state.getNextSubState());
+            SubState curSubState = state.getNextSubState();
+            Feature curRes = getNextFeatureTrained(curSubState,features);
+            features.add(curRes);
         }
+        return transToActions(features);
 
+    }
 
-        return getActionsTrained(subStates);
-
+    private Feature getNextFeatureTrained(SubState curSubState, List<Feature> features) {
+        // TODO: 07/12/2016  
+        return null;
     }
 
     public List<Action> playTraining(State state) {
 
-        List<SubState> subStates = new ArrayList<SubState>();
+        List<Feature> features = new ArrayList<Feature>();
         while (state.hasNextSubState()) {
-            subStates.add(state.getNextSubState());
+            SubState curSubState = state.getNextSubState();
+            //logger.info("substate generated");
+            Feature curRes = getNextFeatureTraining(curSubState,features);
+            logger.info("feature generated");
+            features.add(curRes);
         }
-        return getActionsTraining(subStates);
+        return transToActions(features);
     }
 
-    private List<Action> getActionsTrained(List<SubState> subStates){
-        List<List<Feature>> possFeatures = getPossFeatures(subStates);
+    private Feature getNextFeatureTraining(SubState curSubState, List<Feature> curFeatures) {
+        List<Feature> possNextFeatures = curSubState.getPossibleFeatures(curFeatures);
+        //logger.info("Possible features got");
+        double dice = random.nextDouble();
+
+        if(dice>epsilon){
+            return possNextFeatures.get(random.nextInt(possNextFeatures.size()));
+        }
+        logger.info("curFeature added:"+possNextFeatures.size());
 
         double bestScore = 0;
-        List<Feature> best = possFeatures.get(0);
-        for(int i = 0;i<possFeatures.size();i++){
-            double curScore = getScore(possFeatures.get(i));
-            if(curScore>bestScore) {
+        Feature bestFeature = possNextFeatures.get(0);
+        for(Feature cur:possNextFeatures){
+            curFeatures.add(curFeatures.size()-1,cur);
+            double curScore = getScore(curFeatures);
+            if(curScore>bestScore){
                 bestScore = curScore;
-                best = possFeatures.get(i);
+                bestFeature = cur;
             }
+            curFeatures.remove(curFeatures.size()-1);
         }
-        return transToActions(best);
-    }
+        logger.info("best feature returned");
+        return bestFeature;
 
-    private List<Action> getActionsTraining(List<SubState> subStates) {
-        List<List<Feature>> possFeatures = getPossFeatures(subStates);
-
-        double dice = random.nextDouble();
-        if(dice>=epsilon){
-            return transToActions(possFeatures.get(random.nextInt(possFeatures.size())));
-        }else {
-            double bestScore = 0;
-            List<Feature> best = possFeatures.get(0);
-            for (int i = 0; i < possFeatures.size(); i++) {
-                double curScore = getScore(possFeatures.get(i));
-                if (curScore > bestScore) {
-                    bestScore = curScore;
-                    best = possFeatures.get(i);
-                }
-            }
-            return transToActions(best);
-        }
     }
+    
 
     private double getScore(List<Feature> features) {
         List<List<Double>> vals = new ArrayList<>();
@@ -85,7 +88,6 @@ public class DQNLearner extends AILearner {
             List<Double> curVals =cur.getVals();
             vals.add(curVals);
         }
-
         return Client.sendAndReceive(vals);
     }
 

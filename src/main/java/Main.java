@@ -6,9 +6,11 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class Main extends DefaultBWListener {
 
+    static Logger logger = Logger.getLogger( Main.class.getName() );
 
     private Mirror mirror = new Mirror();
 
@@ -19,7 +21,7 @@ public class Main extends DefaultBWListener {
     private Player self;
 
     private Map<Unit,Command> lastCommands;
-    private static final boolean isTrianing = true;
+    private static final boolean isTraining = true;
 
     private Player enemy;
     private AILearner aiLearner;
@@ -41,7 +43,7 @@ public class Main extends DefaultBWListener {
         enemy = game.enemy();
         lastCommands = new HashMap<Unit, Command>();
         //set learner
-        aiLearner = new DQNLearner(isTrianing);
+        aiLearner = new DQNLearner(isTraining);
 
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
@@ -68,18 +70,18 @@ public class Main extends DefaultBWListener {
         if(self.getUnits().size()== 0||enemy.getUnits().size()==0){
             gameEnd();
         }
+
+        //Skip Frame
+        if(game.getFrameCount()%9 != 0) return;
         State curState = new State(game);
         updateReward(curState);
-        //Skip Frame
-
-        if(game.getFrameCount()%9 != 0) return;
-
-        game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
-
+        logger.info("Sending actions at:" +game.getFrameCount());
         List<Action> actions = aiLearner.play(curState);
+        logger.info("Actions got");
         for(Action action:actions){
             action.execute();
         }
+        logger.info("Actions sent");
         prevState = curState;
     }
 

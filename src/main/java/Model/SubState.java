@@ -1,5 +1,6 @@
 package Model;
 
+import RL.DQNLearner;
 import bwapi.Game;
 import bwapi.Position;
 import bwapi.Unit;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by eclipse on 30/11/2016.
@@ -18,6 +20,8 @@ public class SubState {
     @Getter
     Game game;
 
+    public static Logger logger =  Logger.getLogger( SubState.class.getName() );
+
     public SubState(Unit unit,Game game){
         this.unit = unit;
         this.game = game;
@@ -26,11 +30,15 @@ public class SubState {
     public List<Command> getPossibleCommands() {
         List<Command> res = new ArrayList<Command>();
         if(game.enemy().getUnits().contains(unit)){
+            Command noCommand = new Command(Command.cType.noCommand,unit.getPosition());
+            res.add(noCommand);
             return res;
         }else{
             res.addAll(getMoveCommands());
             res.addAll(getAttackCommands());
         }
+
+
         return res;
     }
 
@@ -64,6 +72,17 @@ public class SubState {
         res.add(se);
         Command noCommand = new Command(Command.cType.noCommand,unit.getPosition());
         res.add(noCommand);
+        return res;
+    }
+
+    public List<Feature> getPossibleFeatures(List<Feature> prev) {
+        List<Feature> res = new ArrayList<>();
+        List<Command> commands = getPossibleCommands();
+        for(Command curCommand:commands){
+            Feature curFeature = new Feature(this,curCommand,prev);
+            res.add(curFeature);
+        }
+        logger.info("feature size"+res.size());
         return res;
     }
 }

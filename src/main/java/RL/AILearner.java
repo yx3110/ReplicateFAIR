@@ -28,27 +28,4 @@ public abstract class AILearner {
 
     public abstract List<Action> playTraining(State state);
 
-    public static List<List<Feature>> getPossFeatures(List<SubState> subStates){
-        List<List<Feature>> possFeatures = new ArrayList<List<Feature>>();
-        for(int i = 0;i<subStates.size();i++){
-            List<Command> curCommands = subStates.get(i).getPossibleCommands();
-            for (int j = 0;j<curCommands.size();j++){
-                for(int k = 0;k<subStates.size();k++){
-                    List<Feature> curList = new ArrayList<Feature>();
-                    possFeatures.add(curList);
-                }
-            }
-        }
-        //fill with features.
-        for (int i = 0; i < subStates.size(); i++) {
-            List<Command> curCommands = subStates.get(i).getPossibleCommands();
-            for (int j = 0; j < curCommands.size(); j++) {
-                for(int k = 0;k<subStates.size();k++){
-                    Feature curFeature = new Feature(subStates.get(i),curCommands.get(j),possFeatures.get(i+k));
-                    possFeatures.get(i+k).add(curFeature);
-                }
-            }
-        }
-        return possFeatures;
-    }
 }
