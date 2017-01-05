@@ -25,7 +25,6 @@ public class Client {
             oos.writeObject(vals);
             oos.close();
 
-
             ServerSocket receive = new ServerSocket(60011);
             Socket receiveSocket = receive.accept();
             ObjectInputStream ois =  new ObjectInputStream(receiveSocket.getInputStream());

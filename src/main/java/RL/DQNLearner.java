@@ -70,6 +70,7 @@ public class DQNLearner extends AILearner {
         for(Feature cur:possNextFeatures){
             curFeatures.add(curFeatures.size()-1,cur);
             double curScore = getScore(curFeatures);
+            if(curScore==-1) logger.warning("score calculation exception");
             if(curScore>bestScore){
                 bestScore = curScore;
                 bestFeature = cur;

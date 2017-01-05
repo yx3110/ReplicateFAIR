@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 public class Feature {
     static Logger logger = Logger.getLogger( Feature.class.getName() );
 
-
     private SubState subState;
     @Getter
     private Unit curUnit;
