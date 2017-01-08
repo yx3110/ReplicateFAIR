@@ -1,10 +1,9 @@
 package Connection;
-import org.eclipse.jetty.server.Server;
+import Model.GameRecord;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.List;
 
 
@@ -18,7 +17,7 @@ public class Client {
     }
 
 
-    public static double sendAndReceive(List<List<Double>> vals) {
+    public static double sendPlay(List<List<Double>> vals) {
         try {
             Socket out = new Socket("localhost", 60010);
             ObjectOutputStream oos = new ObjectOutputStream(out.getOutputStream());
@@ -36,6 +35,17 @@ public class Client {
         } catch (Exception e){
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    public void sendTrain(List<GameRecord> records) {
+        try {
+            Socket out = new Socket("localhost", 60012);
+            ObjectOutputStream oos = new ObjectOutputStream(out.getOutputStream());
+            oos.writeObject(records);
+            oos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

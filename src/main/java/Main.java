@@ -15,7 +15,7 @@ public class Main extends DefaultBWListener {
     private Mirror mirror = new Mirror();
 
     private Map<State[], Double> rewardMap;
-    private State prevState;
+
     private Game game;
 
     private Player self;
@@ -23,12 +23,15 @@ public class Main extends DefaultBWListener {
     private Map<Unit,Command> lastCommands;
     private static final boolean isTraining = true;
 
+    private int counter;
+
     private Player enemy;
     private AILearner aiLearner;
 
     public void run() {
         mirror.getModule().setEventListener(this);
         mirror.startGame();
+
     }
 
     @Override
@@ -38,12 +41,13 @@ public class Main extends DefaultBWListener {
 
     @Override
     public void onStart() {
+        counter = 0;
         game = mirror.getGame();
         self = game.self();
         enemy = game.enemy();
         lastCommands = new HashMap<Unit, Command>();
         //set learner
-        aiLearner = new DQNLearner(isTraining);
+        aiLearner = new DQNLearner(new State(game));
 
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
@@ -60,8 +64,6 @@ public class Main extends DefaultBWListener {
         	}
         	System.out.println();
         }
-        prevState = new State(game);
-
     }
 
 
@@ -73,30 +75,23 @@ public class Main extends DefaultBWListener {
 
         //Skip Frame
         if(game.getFrameCount()%9 != 0) return;
+
+        counter++;
+
         State curState = new State(game);
-        updateReward(curState);
-        logger.info("Sending actions at:" +game.getFrameCount());
+
+        logger.info("Sending actions at:" + counter);
         List<Action> actions = aiLearner.play(curState);
         logger.info("Actions got");
         for(Action action:actions){
             action.execute();
         }
-        logger.info("Actions sent");
-        prevState = curState;
+        logger.info("Actions executed");
     }
 
     private void gameEnd() {
-
-    }
-
-    private void updateReward(State curState) {
-        State[] statePair= new State[2];
-        statePair[0] = prevState;
-        statePair[1] = curState;
-        double healthDiff = prevState.healthDiff(curState);
-        double prevTotalUnit = prevState.getGame().getAllUnits().size();
-        double curTotalUnit = curState.getGame().getAllUnits().size();
-
+        logger.info("Game ends");
+        aiLearner.TrainNN();
     }
 
     public static void main(String[] args) {

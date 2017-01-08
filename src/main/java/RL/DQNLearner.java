@@ -17,45 +17,54 @@ public class DQNLearner extends AILearner {
 
     Random random;
     Client client;
+    List<GameRecord> records;
 
+    List<Feature> prevFeatures;
+    List<Action> prevAction;
     private static final double epsilon = 0.9;
 
-    public DQNLearner(boolean isTraining) {
-        super(isTraining);
+    public DQNLearner(State state) {
+        super();
         random = new Random();
         client = new Client();
+        prevFeatures = new ArrayList<>();
+        prevAction = new ArrayList<>();
+        records = new ArrayList<>();
     }
 
-    public List<Action> playTrained(State state) {
-        List<Feature> features = new ArrayList<Feature>();
-        while (state.hasNextSubState()) {
-            SubState curSubState = state.getNextSubState();
-            Feature curRes = getNextFeatureTrained(curSubState,features);
-            features.add(curRes);
-        }
-        return transToActions(features);
-
-    }
-
-    private Feature getNextFeatureTrained(SubState curSubState, List<Feature> features) {
-        // TODO: 07/12/2016  
-        return null;
-    }
-
-    public List<Action> playTraining(State state) {
+    public List<Action> play(State curState) {
 
         List<Feature> features = new ArrayList<Feature>();
-        while (state.hasNextSubState()) {
-            SubState curSubState = state.getNextSubState();
+        while (curState.hasNextSubState()) {
+            SubState curSubState = curState.getNextSubState();
             //logger.info("substate generated");
-            Feature curRes = getNextFeatureTraining(curSubState,features);
+            Feature curRes = getNextFeature(curSubState,features);
             logger.info("feature generated");
             features.add(curRes);
         }
-        return transToActions(features);
+        List<Action> res = transToActions(features);
+        if(prevAction.size()!=0) {
+            recordTrajectory(features, prevFeatures, prevAction, getReward());
+        }
+        prevFeatures = features;
+        prevAction = res;
+        return res;
     }
 
-    private Feature getNextFeatureTraining(SubState curSubState, List<Feature> curFeatures) {
+    private void recordTrajectory(List<Feature> features, List<Feature> prevFeatures, List<Action> prevAction, double reward) {
+        GameRecord curRecord = new GameRecord();
+        curRecord.setCurState(features);
+        curRecord.setPrevAction(prevAction);
+        curRecord.setPrevState(prevFeatures);
+        curRecord.setReward(reward);
+    }
+
+    @Override
+    public void TrainNN() {
+        client.sendTrain(records);
+    }
+
+    private Feature getNextFeature(SubState curSubState, List<Feature> curFeatures) {
         List<Feature> possNextFeatures = curSubState.getPossibleFeatures(curFeatures);
         //logger.info("Possible features got");
         double dice = random.nextDouble();
@@ -79,7 +88,6 @@ public class DQNLearner extends AILearner {
         }
         logger.info("best feature returned");
         return bestFeature;
-
     }
     
 
@@ -89,7 +97,7 @@ public class DQNLearner extends AILearner {
             List<Double> curVals =cur.getVals();
             vals.add(curVals);
         }
-        return Client.sendAndReceive(vals);
+        return Client.sendPlay(vals);
     }
 
     private List<Action> transToActions(List<Feature> features) {
@@ -101,6 +109,12 @@ public class DQNLearner extends AILearner {
             Action curAction = new Action(curUnit,curCommand);
             res.add(curAction);
         }
+        return res;
+    }
+
+    public double getReward() {
+        // TODO: 07/01/2017  
+        double res = 0;
         return res;
     }
 }

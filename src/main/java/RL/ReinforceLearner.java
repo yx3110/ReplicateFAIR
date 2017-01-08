@@ -9,15 +9,17 @@ import java.util.List;
  */
 public class ReinforceLearner extends AILearner {
     public ReinforceLearner(boolean isTraining) {
-        super(isTraining);
+        super();
     }
 
-    public List<Action> playTrained(State state) {
+
+    @Override
+    public List<Action> play(State state) {
         return null;
     }
 
-    public List<Action> playTraining(State state) {
-        return null;
-    }
+    @Override
+    public void TrainNN() {
 
+    }
 }
