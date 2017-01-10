@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 
@@ -27,101 +28,90 @@ import java.util.logging.Logger;
 public class NeuralNetwork {
     static Logger logger = Logger.getLogger(NeuralNetwork.class.getName() );
 
-    MultiLayerNetwork first2Layers;
-    MultiLayerNetwork next2Layers;
-    static String firstLocationString = "";
-    static String secLocationString= "";
-    private static int outputNum = 100;
+    private final double gamma = 0.90;
+
+    MultiLayerNetwork network;
+    static String saveLocationString = "C:\\ReplicateFAIR\\ExampleBot\\src\\Data\\testSaving.zip";
+    INDArray weights;
     private static final String url = "";
-    private int rngSeed=123;
-    private INDArray weights;
+    //Random number generator seed, for reproducability
+    public static final int seed = 123;
+    //Number of iterations per minibatch
+    public static final int iterations = 1;
+
+    //Number of data points
+    public static final int nSamples = 1000;
+    //Batch size: i.e., each epoch has nSamples/batchSize parameter updates
+    public static final int batchSize = 100;
+    //Network learning rate
+    public static final double learningRate = 0.01;
+    public static final int numInputs = 14;
+    public static final int numOutputs = 100;
     public NeuralNetwork(boolean loadData) {
         if(loadData){
             loadNetwork();
         }
         else{
             initNetwork();
-            weights = Nd4j.zeros(14);
+            weights = Nd4j.zeros(numInputs);
         }
     }
 
     private void initNetwork() {
-
-        MultiLayerConfiguration first2LayersConf = new NeuralNetConfiguration.Builder().seed(rngSeed)
-                .iterations(1)
-                .learningRate(0.1)
+        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed)
+                .iterations(iterations)
+                .weightInit(WeightInit.XAVIER) // Weight initialization.
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+                .learningRate(learningRate)
                 .list()
-                .layer(0, new DenseLayer.Builder()
-                        .nIn(14) // Number of input datapoints.
-                        .nOut(outputNum) // Number of output datapoints.
-                        .activation("elu") // Activation function.
-                        .weightInit(WeightInit.XAVIER) // Weight initialization.
+                .layer(0,new DenseLayer.Builder()
+                        .nIn(numInputs)
+                        .nOut(numOutputs)
+                        .activation("elu")
                         .build())
-                .layer(1, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
+                .layer(1,new DenseLayer.Builder()
                         .nIn(100)
-                        .nOut(outputNum)
+                        .nOut(100)
                         .activation("tanh")
-                        .weightInit(WeightInit.XAVIER)
                         .build())
-                .pretrain(false).backprop(true)
-                .build();
-
-        MultiLayerConfiguration next2LayersConf = new NeuralNetConfiguration.Builder().seed(rngSeed)
-                .iterations(1)
-                .learningRate(0.1)
-                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .list()
-                .layer(0, new DenseLayer.Builder()
-                        .nIn(210) // Number of input datapoints.
-                        .nOut(outputNum) // Number of output datapoints.
-                        .activation("elu") // Activation function.
-                        .weightInit(WeightInit.XAVIER) // Weight initialization.
-                        .build())
-                .layer(1, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .nIn(100)
-                        .nOut(outputNum)
+                .layer(2,new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
                         .activation("relu")
-                        .weightInit(WeightInit.XAVIER)
+                        .nIn(100)
+                        .nOut(1)
                         .build())
                 .pretrain(false).backprop(true)
                 .build();
-
-        first2Layers = new MultiLayerNetwork(first2LayersConf);
-        next2Layers = new MultiLayerNetwork(next2LayersConf);
-        first2Layers.init();
-        next2Layers.init();
+        network = new MultiLayerNetwork(conf);
+        network.init();
     }
+
+
     private void loadNetwork() {
 
-        File firstLocation = new File(firstLocationString);
-        File secLocation = new File(secLocationString);
+        File firstLocation = new File(saveLocationString);
         try {
-            first2Layers = ModelSerializer.restoreMultiLayerNetwork(firstLocation);
-            next2Layers = ModelSerializer.restoreMultiLayerNetwork(secLocation);
-            first2Layers.init();
-            next2Layers.init();
+            network = ModelSerializer.restoreMultiLayerNetwork(firstLocation);
+            network.init();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public Double evaluate(List<List<Double>> valMatrix) {
-/*        List<Double> cTypes = getCTypes(valMatrix);
-        INDArray input = preprocess(valMatrix);
+        INDArray input = preProcess(valMatrix);
 
-        INDArray firstOutput = first2Layers.activate(input);
-        INDArray maxPoolRes = maxPool(firstOutput);
-        INDArray avgPoolRes = avgPool(firstOutput);
-        INDArray poolRes = Nd4j.vstack(maxPoolRes, avgPoolRes);
-        appendType(poolRes);
-        INDArray secOutput = next2Layers.activate();
-        return secOutput.mmul(weights).getDouble(0);
+        INDArray output= network.output(input);
 
-*/
-        return 0.00;
+        return output.getDouble(0);
+
+        // return 0.00;
         // TODO: 06/12/2016 evaluate action based on input features}
     }
+
+    private INDArray maxPool(INDArray firstOutput) {
+        return null;
+    }
+
     private void appendType(INDArray poolRes) {
     }
 
@@ -129,26 +119,21 @@ public class NeuralNetwork {
         return Nd4j.zeros(14);
     }
 
-    private INDArray preprocess(List<List<Double>> valMatrix) {
-        INDArray res = Nd4j.zeros(14);
-        for(int i = 1;i<valMatrix.size();i++){
-            double[] array = new double[valMatrix.get(i).size()];
-            for(int j = 0;j<valMatrix.size();j++){
-                array[j] = valMatrix.get(i).get(j);
+    private INDArray preProcess(List<List<Double>> valMatrix) {
+        double[][] array = new double[valMatrix.size()][valMatrix.get(0).size()];
+        for(int i = 0;i<valMatrix.size();i++){
+            for(int j = 0;j<valMatrix.get(0).size();j++){
+                array[i][j] = valMatrix.get(i).get(j);
             }
-            INDArray cur = Nd4j.create(array);
-            Nd4j.vstack(res,cur);
         }
-        logger.info("input size = " +res);
-        
-        return res;
+        return Nd4j.create(array);
     }
 
 
     private List<Double> addCTypes(double res) {
         return null;
     }
-
+/*
     List<Double> getCTypes(List<List<Double>> valMatrix){
         List<Double> res = new ArrayList<>();
         for(List<Double> curList:valMatrix){
@@ -157,12 +142,41 @@ public class NeuralNetwork {
         }
         return res;
     }
-
+*/
     public void train(List<GameRecord> records) {
         // TODO: 07/01/2017
-        saveData(firstLocationString,secLocationString);
+        logger.info("Starting training");
+        for(int i =0;i<batchSize;i++) {
+            List<GameRecord> sample = sampleRecord(records);
+            double reward1 = sample.get(0).getReward();
+            double reward2 = sample.get(1).getReward();
+            double[] array = new double[1];
+            array[0] = reward2-reward1;
+            INDArray label = Nd4j.create(array);
+            network.fit(label);
+        }
+        saveData();
     }
 
-    private void saveData(String firstLocationString, String secLocationString) {
+    private List<GameRecord> sampleRecord(List<GameRecord> records) {
+        if(records.size()==0) return new ArrayList<>();
+        Random random = new Random();
+
+
+        int sampleIndex = random.nextInt(records.size()-1);
+        List<GameRecord> res = new ArrayList<>();
+        res.add(records.get(sampleIndex));
+        res.add(records.get(sampleIndex+1));
+        return res;
+    }
+
+    private void saveData() {
+        File locationToSave = new File(saveLocationString);
+        boolean saveUpdater = true;                                             //Updater: i.e., the state for Momentum, RMSProp, Adagrad etc. Save this if you want to train your network more in the future
+        try {
+            ModelSerializer.writeModel(network, locationToSave, saveUpdater);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

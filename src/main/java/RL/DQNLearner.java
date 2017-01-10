@@ -23,7 +23,7 @@ public class DQNLearner extends AILearner {
     List<Action> prevAction;
     private static final double epsilon = 0.9;
 
-    public DQNLearner(State state) {
+    public DQNLearner() {
         super();
         random = new Random();
         client = new Client();
@@ -33,6 +33,7 @@ public class DQNLearner extends AILearner {
     }
 
     public List<Action> play(State curState) {
+
 
         List<Feature> features = new ArrayList<Feature>();
         while (curState.hasNextSubState()) {
@@ -53,10 +54,19 @@ public class DQNLearner extends AILearner {
 
     private void recordTrajectory(List<Feature> features, List<Feature> prevFeatures, List<Action> prevAction, double reward) {
         GameRecord curRecord = new GameRecord();
-        curRecord.setCurState(features);
+        curRecord.setCurState(getVals(features));
         curRecord.setPrevAction(prevAction);
-        curRecord.setPrevState(prevFeatures);
+        curRecord.setPrevState(getVals(prevFeatures));
         curRecord.setReward(reward);
+        records.add(curRecord);
+    }
+
+    private List<List<Double>> getVals(List<Feature> features) {
+        List<List<Double>> res = new ArrayList<>();
+        for(Feature curFeature:features){
+            res.add(curFeature.getVals());
+        }
+        return res;
     }
 
     @Override

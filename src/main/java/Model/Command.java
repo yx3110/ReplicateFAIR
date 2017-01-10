@@ -6,10 +6,12 @@ import bwapi.UnitCommandType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * Created by Yang Xu on 23/11/2016.
  */
-public class Command {
+public class Command implements Serializable{
 
     public static cType parseCommandType(UnitCommandType unitCommandType) {
         if (unitCommandType.equals(UnitCommandType.Attack_Move)||unitCommandType.equals(UnitCommandType.Attack_Unit)){
@@ -17,6 +19,10 @@ public class Command {
         }else if (unitCommandType.equals(unitCommandType.Move)){
             return cType.move;
         }else return cType.noCommand;
+    }
+
+    public Position getTargetPos() {
+        return new Position(targetX,targetY);
     }
 
     public enum cType{
@@ -32,22 +38,25 @@ public class Command {
 
     public Command(cType type, Position targetPos){
         this.commandType = type;
-        this.targetPos = targetPos;
+        targetX = targetPos.getX();
+        targetY = targetPos.getY();
     }
 
     @Getter@Setter
     private cType commandType;
 
     @Getter
-    private Position targetPos;
+    private int targetX;
+    @Getter
+    private int targetY;
 
     public void execute(Unit unit){
         switch (commandType){
             case move:
-                unit.move(targetPos);
+                unit.move(new Position(targetX,targetY));
                 break;
             case atk:
-                unit.attack(targetPos);
+                unit.attack(new Position(targetX,targetY));
                 break;
             case noCommand:
                 break;

@@ -14,13 +14,12 @@ public class Main extends DefaultBWListener {
 
     private Mirror mirror = new Mirror();
 
-    private Map<State[], Double> rewardMap;
+    private final int skipFrame = 9;
 
     private Game game;
 
     private Player self;
 
-    private Map<Unit,Command> lastCommands;
     private static final boolean isTraining = true;
 
     private int counter;
@@ -45,9 +44,8 @@ public class Main extends DefaultBWListener {
         game = mirror.getGame();
         self = game.self();
         enemy = game.enemy();
-        lastCommands = new HashMap<Unit, Command>();
         //set learner
-        aiLearner = new DQNLearner(new State(game));
+        aiLearner = new DQNLearner();
 
         //Use BWTA to analyze map
         //This may take a few minutes if the map is processed first time!
@@ -69,13 +67,9 @@ public class Main extends DefaultBWListener {
 
     @Override
     public void onFrame() {
-        if(self.getUnits().size()== 0||enemy.getUnits().size()==0){
-            gameEnd();
-        }
 
         //Skip Frame
-        if(game.getFrameCount()%9 != 0) return;
-
+        if(game.getFrameCount()%skipFrame != 0) return;
         counter++;
 
         State curState = new State(game);
@@ -84,13 +78,19 @@ public class Main extends DefaultBWListener {
         List<Action> actions = aiLearner.play(curState);
         logger.info("Actions got");
         for(Action action:actions){
-            action.execute();
+            executeAction(action);
         }
         logger.info("Actions executed");
     }
 
-    private void gameEnd() {
-        logger.info("Game ends");
+    private void executeAction(Action action) {
+        Unit unit = game.getUnit(action.getUnitID());
+        Command command = action.getCommand();
+        command.execute(unit);
+    }
+
+    @Override
+    public void onEnd(boolean isWinner) {
         aiLearner.TrainNN();
     }
 

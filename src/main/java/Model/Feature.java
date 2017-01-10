@@ -3,6 +3,7 @@ package Model;
 import bwapi.*;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -10,7 +11,7 @@ import java.util.logging.Logger;
 /**
  * Created by Yang Xu on 23/11/2016.
  */
-public class Feature {
+public class Feature implements Serializable {
     static Logger logger = Logger.getLogger( Feature.class.getName() );
 
     private SubState subState;
@@ -46,22 +47,23 @@ public class Feature {
     }
 
     public void initFeature(){
-        double HP= curUnit.getHitPoints();;
+        double HP= curUnit.getHitPoints();
         double shield = curUnit.getShields();
         double CD = curUnit.getGroundWeaponCooldown();
         double isEnemy = subState.getGame().self().equals(curUnit.getPlayer())?1:0;
-        double unitType = curUnit.getType().equals(UnitType.Terran_Marine)?1:0;
+        //double unitType = curUnit.getType().equals(UnitType.Terran_Marine)?1:0;
         vals.add(HP);
         vals.add(shield);
         vals.add(CD);
         vals.add(isEnemy);
-        vals.add(unitType);
+        //vals.add(unitType);
 
         initRelativeFeatures();
 
         Command.cType prevCmdType =Command.parseCommandType
                 (curUnit.getLastCommand().getUnitCommandType());
         vals.add((double)prevCmdType.getVal());
+        logger.info("Feature size"+vals.size());
 
     }
 

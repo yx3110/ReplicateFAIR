@@ -17,6 +17,7 @@ public class TrainThread extends Thread{
 
     private NeuralNetwork nn;
     public TrainThread(NeuralNetwork nn) {
+        this.nn = nn;
     }
     @Override
     public void run(){

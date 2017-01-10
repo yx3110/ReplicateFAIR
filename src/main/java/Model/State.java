@@ -49,31 +49,4 @@ public class State {
         return unitLeft.size()!=0;
     }
 
-    public double healthDiff(State state2){
-        State state1 = this;
-        List<Unit> enemyUnits1= state1.getGame().enemy().getUnits();
-        List<Unit> enemyUnits2 = state2.getGame().enemy().getUnits();
-        List<Unit> myUnits1 = state1.getGame().self().getUnits();
-        List<Unit> myUnits2 = state2.getGame().self().getUnits();
-        double enemyHealth1 = 0,enemyHealth2 = 0, myHealth1 = 0,myHealth2=0;
-        for(Unit cur:enemyUnits1){
-            enemyHealth1+= cur.getHitPoints();
-        }
-        for(Unit cur:enemyUnits2){
-            enemyHealth2+=cur.getHitPoints();
-        }
-
-        for(Unit cur:myUnits1){
-            myHealth1+=cur.getHitPoints();
-        }
-
-        for(Unit cur:myUnits2){
-            enemyHealth2+=cur.getHitPoints();
-        }
-        double damageTaken = myHealth1 - myHealth2;
-        double damageCaused = enemyHealth1-enemyHealth2;
-        return damageCaused-damageTaken;
-    }
-
-
 }

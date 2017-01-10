@@ -30,7 +30,6 @@ public class PlayThread extends Thread {
                 Socket s = ss.accept();
                 ObjectInputStream in = new ObjectInputStream(s.getInputStream());
                 List<List<Double>> valMatrix = (List<List<Double>>) in.readObject();
-                logger.info("msg received");
 
                 Double score = nn.evaluate(valMatrix);
 
