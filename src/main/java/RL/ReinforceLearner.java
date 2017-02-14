@@ -22,4 +22,9 @@ public class ReinforceLearner extends AILearner {
     public void TrainNN() {
 
     }
+
+    @Override
+    public void clearRecords() {
+
+    }
 }

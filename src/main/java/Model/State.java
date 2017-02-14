@@ -20,16 +20,18 @@ public class State {
     Random random;
 
     static Logger logger = Logger.getLogger( State.class.getName() );
-
+    @Getter
     private List<Unit> unitLeft;
 
     public State(Game game){
         this.game = game;
         random = new Random();
-        unitLeft = new ArrayList<Unit>();
+        unitLeft = new ArrayList<>();
         List<Unit> allUnits = game.getAllUnits();
         for(Unit curUnit:allUnits){
-            if(curUnit.getType().equals(UnitType.Terran_Marine))unitLeft.add(curUnit);
+            if(curUnit.getType()==UnitType.Terran_Marine){
+                unitLeft.add(curUnit);
+            }
         }
     }
 
@@ -49,4 +51,35 @@ public class State {
         return unitLeft.size()!=0;
     }
 
+    public int getNumUnits() {
+        int res = 0;
+        List<Unit> allUnits = game.getAllUnits();
+        for(Unit curUnit:allUnits){
+            if(curUnit.getType()==UnitType.Terran_Marine){
+                res++;
+            }
+        }
+        return res;
+    }
+
+    public double getMyCurTotalHP() {
+        double res = 0;
+        List<Unit> allUnits = game.getAllUnits();
+        for(Unit curUnit:allUnits){
+            if(curUnit.getType()==UnitType.Terran_Marine&&curUnit.getPlayer()==game.self()){
+                res+=curUnit.getHitPoints();
+            }
+        }
+        return res;
+    }
+    public double getEnemyCurTotalHP(){
+        double res = 0;
+        List<Unit> allUnits = game.getAllUnits();
+        for(Unit curUnit:allUnits){
+            if(curUnit.getType()==UnitType.Terran_Marine&&curUnit.getPlayer()==game.enemy()){
+                res+=curUnit.getHitPoints();
+            }
+        }
+        return res;
+    }
 }

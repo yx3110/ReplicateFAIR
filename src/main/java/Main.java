@@ -17,14 +17,12 @@ public class Main extends DefaultBWListener {
     private final int skipFrame = 9;
 
     private Game game;
-
-    private Player self;
-
+    int gamesPlayed = 0;
+    int win = 0;
     private static final boolean isTraining = true;
 
     private int counter;
 
-    private Player enemy;
     private AILearner aiLearner;
 
     public void run() {
@@ -42,8 +40,6 @@ public class Main extends DefaultBWListener {
     public void onStart() {
         counter = 0;
         game = mirror.getGame();
-        self = game.self();
-        enemy = game.enemy();
         //set learner
         aiLearner = new DQNLearner();
 
@@ -76,7 +72,7 @@ public class Main extends DefaultBWListener {
 
         logger.info("Sending actions at:" + counter);
         List<Action> actions = aiLearner.play(curState);
-        logger.info("Actions got");
+        logger.info("Actions from server received");
         for(Action action:actions){
             executeAction(action);
         }
@@ -91,7 +87,11 @@ public class Main extends DefaultBWListener {
 
     @Override
     public void onEnd(boolean isWinner) {
+        gamesPlayed++;
+        if(isWinner) win++;
+        logger.info("win/gamesPlayed = " +win+"/"+gamesPlayed);
         aiLearner.TrainNN();
+        aiLearner.clearRecords();
     }
 
     public static void main(String[] args) {

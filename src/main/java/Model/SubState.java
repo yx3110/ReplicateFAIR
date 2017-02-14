@@ -29,7 +29,7 @@ public class SubState {
 
     public List<Command> getPossibleCommands() {
         List<Command> res = new ArrayList<Command>();
-        if(game.enemy().getUnits().contains(unit)){
+        if(game.enemy()==unit.getPlayer()){
             Command noCommand = new Command(Command.cType.noCommand,unit.getPosition());
             res.add(noCommand);
             return res;
@@ -80,7 +80,6 @@ public class SubState {
             Feature curFeature = new Feature(this,curCommand,prev);
             res.add(curFeature);
         }
-        logger.info("feature size"+res.size());
         return res;
     }
 }

@@ -21,4 +21,6 @@ public abstract class AILearner {
     public abstract List<Action> play(State state);
 
     public abstract void TrainNN();
+
+    public abstract void clearRecords();
 }

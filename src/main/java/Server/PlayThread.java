@@ -2,10 +2,12 @@ package Server;
 
 import DL.NeuralNetwork;
 
+import java.io.BufferedReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -29,10 +31,9 @@ public class PlayThread extends Thread {
             while (true) {
                 Socket s = ss.accept();
                 ObjectInputStream in = new ObjectInputStream(s.getInputStream());
-                List<List<Double>> valMatrix = (List<List<Double>>) in.readObject();
-
+                List<HashMap<String,Double>> valMatrix = (List<HashMap<String,Double>>) in.readObject();
+                logger.info("Play request received");
                 Double score = nn.evaluate(valMatrix);
-
                 Socket reply = new Socket("localhost", 60011);
                 ObjectOutputStream oos = new ObjectOutputStream(reply.getOutputStream());
                 oos.writeObject(score);

@@ -30,7 +30,6 @@ public class TrainThread extends Thread{
                 ObjectInputStream in = new ObjectInputStream(s.getInputStream());
                 List<GameRecord> records= (List<GameRecord>) in.readObject();
                 logger.info("msg received");
-
                 nn.train(records);
             }
         }catch (Exception e){

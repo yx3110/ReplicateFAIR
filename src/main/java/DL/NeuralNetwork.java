@@ -16,9 +16,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Logger;
 
 
@@ -30,8 +28,9 @@ public class NeuralNetwork {
 
     private final double gamma = 0.90;
 
+    private static final boolean isTraining = true;
     MultiLayerNetwork network;
-    static String saveLocationString = "C:\\ReplicateFAIR\\ExampleBot\\src\\Data\\testSaving.zip";
+    static String saveLocationString = "C:\\ReplicateFAIR\\ExampleBot\\src\\Data\\testSaving1.zip";
     INDArray weights;
     private static final String url = "";
     //Random number generator seed, for reproducability
@@ -69,16 +68,12 @@ public class NeuralNetwork {
                         .nOut(numOutputs)
                         .activation("elu")
                         .build())
-                .layer(1,new DenseLayer.Builder()
-                        .nIn(100)
-                        .nOut(100)
-                        .activation("tanh")
-                        .build())
-                .layer(2,new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .activation("relu")
+                .layer(1,new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
                         .nIn(100)
                         .nOut(1)
+                        .activation("tanh")
                         .build())
+
                 .pretrain(false).backprop(true)
                 .build();
         network = new MultiLayerNetwork(conf);
@@ -97,43 +92,34 @@ public class NeuralNetwork {
         }
     }
 
-    public Double evaluate(List<List<Double>> valMatrix) {
+    public Double evaluate(List<HashMap<String,Double>> valMatrix) {
         INDArray input = preProcess(valMatrix);
 
         INDArray output= network.output(input);
 
-        return output.getDouble(0);
-
-        // return 0.00;
-        // TODO: 06/12/2016 evaluate action based on input features}
+        double res = output.getDouble(0);
+        return res;
     }
 
-    private INDArray maxPool(INDArray firstOutput) {
-        return null;
-    }
 
-    private void appendType(INDArray poolRes) {
-    }
-
-    private INDArray avgPool(INDArray firstOutput) {
-        return Nd4j.zeros(14);
-    }
-
-    private INDArray preProcess(List<List<Double>> valMatrix) {
-        double[][] array = new double[valMatrix.size()][valMatrix.get(0).size()];
+    private INDArray preProcess(List<HashMap<String,Double>> valMatrix) {
+        double[][] array = new double[valMatrix.size()][valMatrix.get(0).keySet().size()];
         for(int i = 0;i<valMatrix.size();i++){
-            for(int j = 0;j<valMatrix.get(0).size();j++){
-                array[i][j] = valMatrix.get(i).get(j);
+            Set<String> curKeySet = valMatrix.get(i).keySet();
+            int j = 0;
+            for(String key:curKeySet){
+                array[i][j] = valMatrix.get(i).get(key);
+                j++;
             }
         }
         return Nd4j.create(array);
     }
 
-
+/*
     private List<Double> addCTypes(double res) {
         return null;
     }
-/*
+
     List<Double> getCTypes(List<List<Double>> valMatrix){
         List<Double> res = new ArrayList<>();
         for(List<Double> curList:valMatrix){
@@ -144,29 +130,63 @@ public class NeuralNetwork {
     }
 */
     public void train(List<GameRecord> records) {
-        // TODO: 07/01/2017
+        if(!isTraining) return;
         logger.info("Starting training");
-        for(int i =0;i<batchSize;i++) {
-            List<GameRecord> sample = sampleRecord(records);
-            double reward1 = sample.get(0).getReward();
-            double reward2 = sample.get(1).getReward();
-            double[] array = new double[1];
-            array[0] = reward2-reward1;
-            INDArray label = Nd4j.create(array);
-            network.fit(label);
+        for(int i =0;i<records.size();i++) {
+            GameRecord sample = records.get(i);
+            if(sample.getPrevState().size()!=0) {
+                double[] labelArray = new double[1];
+                labelArray[0] = getQValue(sample);
+
+                INDArray inputArray = preProcess(sample.getPrevState());
+                INDArray label = Nd4j.create(labelArray);
+                network.fit(inputArray, label);
+            }
         }
+        logger.info("Training Complete");
         saveData();
     }
 
-    private List<GameRecord> sampleRecord(List<GameRecord> records) {
-        if(records.size()==0) return new ArrayList<>();
+    private double getQValue(GameRecord sample) {
+        if(sample==null) return 0;
+        List<HashMap<String,Double>> vals1 = sample.getPrevState();
+        List<HashMap<String,Double>> vals2 = sample.getCurState();
+        int numOfUnits1 =sample.getCurNumberOfUnits();
+        int numOfUnits2 = sample.getPrevNumberOfUnits();
+        double myUnitHPDif = getHPDif(sample,true);
+        double enemyUnitHPDif = getHPDif(sample,false);
+        double nextBestQ = 0;
+        List<List<HashMap<String,Double>>> possibleNextMoves = sample.getCurStatePossibleFeatures();
+        for(List<HashMap<String,Double>> cur:possibleNextMoves){
+            INDArray curINDArray = preProcess(cur);
+            INDArray output= network.output(curINDArray);
+            double res = output.getDouble(0);
+            if(res>=nextBestQ) nextBestQ = res;
+        }
+        logger.info("myUnitHPDif:"+myUnitHPDif+", enemyUnitHPDif:"+enemyUnitHPDif);
+        double res = ((myUnitHPDif-enemyUnitHPDif)+numOfUnits2*nextBestQ)/numOfUnits1;
+        logger.info("NextBestQ = "+nextBestQ+",Expected Q value = "+res );
+        return res;
+    }
+
+    private double getHPDif(GameRecord sample,boolean myUnits ) {
+        double hp1 = 0;
+        double hp2 = 0;
+        if(myUnits){
+            hp1 = sample.getMyCurTotalHP();
+            hp2 = sample.getMyPrevTotalHP();
+        }else{
+            hp1 = sample.getEnemyCurTotalHP();
+            hp2 = sample.getEnemyPrevTotalHP();
+        }
+        logger.info("hp1="+hp1+",hp2="+hp2);
+        return Math.abs(hp1-hp2);
+    }
+
+    private GameRecord sampleRecord(List<GameRecord> records) {
         Random random = new Random();
+        GameRecord res =records.get(random.nextInt(records.size()-1));
 
-
-        int sampleIndex = random.nextInt(records.size()-1);
-        List<GameRecord> res = new ArrayList<>();
-        res.add(records.get(sampleIndex));
-        res.add(records.get(sampleIndex+1));
         return res;
     }
 
@@ -175,6 +195,7 @@ public class NeuralNetwork {
         boolean saveUpdater = true;                                             //Updater: i.e., the state for Momentum, RMSProp, Adagrad etc. Save this if you want to train your network more in the future
         try {
             ModelSerializer.writeModel(network, locationToSave, saveUpdater);
+            logger.info("Data saved");
         }catch (Exception e){
             e.printStackTrace();
         }

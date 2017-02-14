@@ -22,4 +22,9 @@ public class ZOGLearner extends AILearner {
     public void TrainNN() {
 
     }
+
+    @Override
+    public void clearRecords() {
+
+    }
 }
